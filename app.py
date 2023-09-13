@@ -175,7 +175,7 @@ def get_grapheme(gr,vd,cd):
         return get_grapheme_root(gr)+get_vowel_diacritic(vd)+get_consonant_diacritic(cd)
 
 
-hf_hub_download(repo_id="samanjoy2/abc", filename="test.hdf5")
+hf_hub_download(repo_id="samanjoy2/abc", filename="test.hdf5", local_dir = './')
 
 model.load_weights('test.hdf5')
 
