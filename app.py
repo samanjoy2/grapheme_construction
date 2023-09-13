@@ -204,7 +204,7 @@ if uploaded_file:
     
     grapheme_pred = pred_grapheme_root_char + pred_consonant_diacritic_char + pred_vowel_diacritic_char
     
-    st.markdown('Grapheme Root: '+str(pred_grapheme_root_char))
+    st.markdown('Grapheme Root: '+*str(pred_grapheme_root_char)*)
     st.markdown('Vowel Diacritic: '+str(pred_vowel_diacritic_char))
     st.markdown('Constant Diacritic: '+str(pred_consonant_diacritic_char))
     
