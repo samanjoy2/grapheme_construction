@@ -183,7 +183,10 @@ y_pred_vowel_diacritic.append(pred_vowel_diacritic)
 y_pred_consonant_diacritic.append(np.argmax(pr[2], axis=-1)[0])
 
 
-plt.rcParams["figure.figsize"] = (1,1)
+width = st.sidebar.slider("plot width", 1, 25, 3)
+height = st.sidebar.slider("plot height", 1, 25, 1)
+
+plt.rcParams["figure.figsize"] = (width,height)
 
 plt.imshow(img[0, :, :, :], cmap='gray')
 st.pyplot(plt)
