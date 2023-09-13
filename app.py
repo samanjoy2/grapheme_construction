@@ -25,8 +25,8 @@ from PIL import Image
 from keras.preprocessing.image import ImageDataGenerator
 from io import StringIO
 
-st.title('Grapheme Reconstruction', divider = 'rainbow')
-st.subheader('Upload an image and get the Grapheme Reconstructed')
+st.title('Grapheme Reconstruction')
+st.subheader('Upload an image and get the Grapheme Reconstructed', divider = 'rainbow')
 uploaded_file = st.file_uploader("Choose a file")
 
 
