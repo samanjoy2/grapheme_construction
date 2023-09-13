@@ -185,7 +185,7 @@ y_pred_consonant_diacritic.append(np.argmax(pr[2], axis=-1)[0])
 
 image = Image.open('image.png')
 
-st.image(image, caption='Grapheme Image')
+st.image(image, caption='Image Used for Reconstruction')
 
 pred_grapheme_root_char = get_grapheme_root(pred_grapheme_root)
 pred_vowel_diacritic_char = get_vowel_diacritic(pred_vowel_diacritic)
