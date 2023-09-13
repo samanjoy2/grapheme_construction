@@ -24,6 +24,9 @@ import locale
 from PIL import Image
 from keras.preprocessing.image import ImageDataGenerator
 
+st.title('Grapheme Reconstruction')
+st.header('Upload a image and get the Grapheme Reconstructed')
+
 df = pd.read_csv('train.csv')
 
 grapheme_roots = df['grapheme_root'].values
