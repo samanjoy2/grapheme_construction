@@ -20,7 +20,7 @@ import sys
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.model_selection import train_test_split
 import locale
-locale.setlocale(locale.LC_ALL, 'bn_BD.UTF-8')
+# locale.setlocale(locale.LC_ALL, 'bn_BD.UTF-8')
 from keras.preprocessing.image import ImageDataGenerator
 
 df = pd.read_csv('train.csv')
