@@ -206,12 +206,12 @@ if uploaded_file:
     y_pred_vowel_diacritic_new.append(pred_vowel_diacritic)
     y_pred_consonant_diacritic_new.append(np.argmax(pr[2], axis=-1)[0])
 
-    st.markdown(get_grapheme_root(pred_grapheme_root))
-    st.markdown(get_vowel_diacritic(pred_vowel_diacritic))
-    st.markdown(get_consonant_diacritic(np.argmax(pr[2], axis=-1)[0]))
+    st.markdown('Grapheme Root: '+str(get_grapheme_root(pred_grapheme_root)))
+    st.markdown('Vowel Diacritic: '+str(get_vowel_diacritic(pred_vowel_diacritic)))
+    st.markdown('Constant Diacritic: '+str(get_consonant_diacritic(np.argmax(pr[2], axis=-1)[0])))
 
     plt.imshow(img[0, ::])
-    st.pyplot(plt, use_container_width=False)
+    st.pyplot(plt, use_container_width=True)
 
     # st.subheader("Grapheme : "+str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
     st.subheader(":green[Main Prediction =] "+str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
