@@ -182,14 +182,9 @@ y_pred_grapheme_root.append(pred_grapheme_root)
 y_pred_vowel_diacritic.append(pred_vowel_diacritic)
 y_pred_consonant_diacritic.append(np.argmax(pr[2], axis=-1)[0])
 
+image = Image.open('image.png')
 
-width = st.sidebar.slider("plot width", 1, 25, 3)
-height = st.sidebar.slider("plot height", 1, 25, 1)
-
-plt.rcParams["figure.figsize"] = (width,height)
-
-plt.imshow(img[0, :, :, :], cmap='gray')
-st.pyplot(plt)
+st.image(image, caption='Grapheme Image')
 
 pred_grapheme_root_char = get_grapheme_root(pred_grapheme_root)
 pred_vowel_diacritic_char = get_vowel_diacritic(pred_vowel_diacritic)
