@@ -4,3 +4,6 @@ pandas
 matplotlib
 split-folders
 scikit-learn
+tqdm
+seaborn
+huggingface_hub
