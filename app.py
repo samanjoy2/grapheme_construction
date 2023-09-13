@@ -25,7 +25,7 @@ from PIL import Image
 from keras.preprocessing.image import ImageDataGenerator
 
 st.title('Grapheme Reconstruction')
-st.header('Upload a image and get the Grapheme Reconstructed')
+st.header('Upload an image and get the Grapheme Reconstructed')
 
 df = pd.read_csv('train.csv')
 
@@ -194,16 +194,14 @@ pred_grapheme_root_char = get_grapheme_root(pred_grapheme_root)
 pred_vowel_diacritic_char = get_vowel_diacritic(pred_vowel_diacritic)
 pred_consonant_diacritic_char = get_consonant_diacritic(pred_consonant_diacritic)
 
-
 grapheme_pred = pred_grapheme_root_char + pred_vowel_diacritic_char + pred_consonant_diacritic_char
 
-st.write('grapheme_root '+str(pred_grapheme_root_char)+' + constant_diacritic '+str(pred_consonant_diacritic_char)+' + vowel_diacritic '+str(pred_vowel_diacritic_char)+' = ', grapheme_pred)
+st.write('Grapheme Root '+str(pred_grapheme_root_char)+' + Constant Diacritic '+str(pred_consonant_diacritic_char)+' + Vowel Diacritic '+str(pred_vowel_diacritic_char)+' = ', grapheme_pred)
 
 grapheme_pred = pred_grapheme_root_char + pred_consonant_diacritic_char + pred_vowel_diacritic_char
 
-st.write('grapheme_root '+str(pred_grapheme_root_char)+' + vowel_diacritic '+str(pred_vowel_diacritic_char)+' + consonant_diacritic '+str(pred_consonant_diacritic_char)+' = ', grapheme_pred)
-
+st.write('Grapheme Root '+str(pred_grapheme_root_char)+' + Vowel Diacritic '+str(pred_vowel_diacritic_char)+' + Constant Diacritic '+str(pred_consonant_diacritic_char)+' = ', grapheme_pred)
 
 grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
 
-st.write("Grapheme from CSV (Prediction) = ", grapheme_from_csv)
+st.write("Complete Prediction = ", grapheme_from_csv)
