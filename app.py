@@ -206,7 +206,7 @@ if uploaded_file:
     
     st.subheader('Grapheme Root '+str(pred_grapheme_root_char))
     st.subheader('Vowel Diacritic '+str(pred_vowel_diacritic_char))
-    st.subheader('Constant Diacritic '+str(pred_consonant_diacritic_char)+' = ', grapheme_pred))
+    st.subheader('Constant Diacritic '+str(pred_consonant_diacritic_char)+' = ', grapheme_pred)
     
     grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
     
