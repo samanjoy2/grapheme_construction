@@ -183,7 +183,7 @@ if uploaded_file:
 
     image = Image.open(uploaded_file)
     
-    st.image(image,width=100, caption='Image Used for Reconstruction')
+    st.image(image,width=200, caption='Image Used for Reconstruction')
 
     y_true_grapheme_root_new = []
     y_true_vowel_diacritic_new = []
