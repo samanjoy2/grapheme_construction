@@ -211,4 +211,4 @@ if uploaded_file:
     grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
     
     # st.write("Complete Prediction = ", grapheme_from_csv)
-    st.subheader(":green[Complete Prediction =] "+str(grapheme_pred))
+    st.subheader(":green[Main Prediction =] "+str(grapheme_pred))
