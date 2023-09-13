@@ -17,13 +17,16 @@ import zipfile
 from keras.callbacks import ModelCheckpoint, EarlyStopping, CSVLogger, LearningRateScheduler
 import shutil
 import sys
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 import locale
-# locale.setlocale(locale.LC_ALL, 'bn_BD.UTF-8')
-from PIL import Image
+locale.setlocale(locale.LC_ALL, 'bn_BD.UTF-8')
 from keras.preprocessing.image import ImageDataGenerator
+from tqdm import tqdm
+import seaborn as sn
 from io import StringIO
+from PIL import Image
+from huggingface_hub import hf_hub_download
 
 st.title('Grapheme Reconstruction')
 st.subheader('Upload an image and get the Grapheme Reconstructed', divider = 'rainbow')
@@ -35,19 +38,23 @@ df = pd.read_csv('train.csv')
 grapheme_roots = df['grapheme_root'].values
 n, c = np.unique(grapheme_roots, return_counts=True)
 total_grapheme_roots = len(n)
+# print(total_grapheme_roots, 'total_grapheme_roots')
 
 vowel_diacritic = df['vowel_diacritic'].values
 n, c = np.unique(vowel_diacritic, return_counts=True)
 total_vowel_diacritic = len(n)
+# print(total_vowel_diacritic, 'total_vowel_diacritic')
 
 consonant_diacritic = df['consonant_diacritic'].values
 n, c = np.unique(consonant_diacritic, return_counts=True)
 total_consonant_diacritic = len(n)
+# print(total_consonant_diacritic, 'total_consonant_diacritic')
+
 
 def simple_model():
 
     f = 16
-    x = Input(shape=(120,120,1,))
+    x = Input(shape=(200,200,1,))
     init=x
 
     conv = Conv2D(f, 3, strides=1, padding='same', activation='relu')(init)
@@ -123,11 +130,11 @@ consonant_diacritics = {}
 consonant_diacritics[0] = ''
 consonant_diacritics[1] = 'ঁ'
 consonant_diacritics[2] = '\u09b0\u09cd'
-consonant_diacritics[3] = 'র্য' #//ref + ja fala
+consonant_diacritics[3] = '্য' #//ref + ja fala
 consonant_diacritics[4] = '্য'
 consonant_diacritics[5] = '্র'
 consonant_diacritics[6] = '্র্য'
-consonant_diacritics[7] = 'র্্র'#ref + ra fala
+consonant_diacritics[7] = '্র' #ref + ra fala
 
 
 def get_grapheme_root(numeric):
@@ -144,71 +151,113 @@ def get_consonant_diacritic(numeric):
     global consonant_diacritics
     return consonant_diacritics[numeric]
 
-
 consonant_middle=[5,4,6]
 consonant_after=[1]
 consonant_before=[2]
-
+consonant_combined=[3,7]
 def get_grapheme(gr,vd,cd):
     consonant_middle=[5,4,6]
     consonant_after=[1]
+    consonant_before=[2]
+    consonant_combined=[3,7]
 
-
-    if cd in consonant_middle:
+    if cd==0:
+        return get_grapheme_root(gr)+get_vowel_diacritic(vd)
+    elif cd in consonant_middle:
         return get_grapheme_root(gr)+get_consonant_diacritic(cd)+get_vowel_diacritic(vd)
-    elif cd==2:
+    elif cd in consonant_before: #ref
         return get_consonant_diacritic(cd)+get_grapheme_root(gr)+get_vowel_diacritic(vd)
-    elif cd==3:
-        return '\u09b0\u09cd'+get_grapheme_root(gr)+'্য'+get_vowel_diacritic(vd)
-    elif cd==7:
-        return '\u09b0\u09cd'+get_grapheme_root(gr)+'্র'+get_vowel_diacritic(vd)
+    elif cd in consonant_combined :#ref+ ja fala
+
+        return '\u09b0\u09cd'+get_grapheme_root(gr)+get_consonant_diacritic(cd)+get_vowel_diacritic(vd)
+
     elif cd in consonant_after:
         return get_grapheme_root(gr)+get_vowel_diacritic(vd)+get_consonant_diacritic(cd)
 
+
+hf_hub_download(repo_id="samanjoy2/abc", filename="test.hdf5")
+
 model.load_weights('test.hdf5')
 
-y_true_grapheme_root = []
-y_true_vowel_diacritic = []
-y_true_consonant_diacritic = []
-
-y_pred_grapheme_root = []
-y_pred_vowel_diacritic = []
-y_pred_consonant_diacritic = []
-
 if uploaded_file:
-    img = tf.keras.utils.load_img(uploaded_file, color_mode='grayscale',target_size=(120, 120))
-    img = tf.keras.utils.img_to_array(img)/255.
-    img = np.expand_dims(img, axis=0)
-    pr = model.predict(img, verbose=0)
-    
-    pred_grapheme_root = np.argmax(pr[0], axis=-1)[0]
-    pred_vowel_diacritic = np.argmax(pr[1], axis=-1)[0]
-    pred_consonant_diacritic = np.argmax(pr[2], axis=-1)[0]
-    
-    
-    y_pred_grapheme_root.append(pred_grapheme_root)
-    y_pred_vowel_diacritic.append(pred_vowel_diacritic)
-    y_pred_consonant_diacritic.append(np.argmax(pr[2], axis=-1)[0])
-    
+
     image = Image.open(uploaded_file)
     
     st.image(image, caption='Image Used for Reconstruction')
+
+    y_true_grapheme_root_new = []
+    y_true_vowel_diacritic_new = []
+    y_true_consonant_diacritic_new = []
+
+    y_pred_grapheme_root_new = []
+    y_pred_vowel_diacritic_new = []
+    y_pred_consonant_diacritic_new = []
+
+    img = tf.keras.utils.load_img(uploaded_file, color_mode='grayscale',target_size=(200, 200))
+    img = tf.keras.utils.img_to_array(img)/255.
+    img = np.expand_dims(img, axis=0)
+    pr = model.predict(img, verbose=0)
+
+    pred_grapheme_root = np.argmax(pr[0], axis=-1)[0]
+    pred_vowel_diacritic = np.argmax(pr[1], axis=-1)[0]
+    pred_consonant_diacritic = np.argmax(pr[2], axis=-1)[0]
+
+    y_pred_grapheme_root_new.append(pred_grapheme_root)
+    y_pred_vowel_diacritic_new.append(pred_vowel_diacritic)
+    y_pred_consonant_diacritic_new.append(np.argmax(pr[2], axis=-1)[0])
+
+    st.markdown(get_grapheme_root(pred_grapheme_root))
+    st.markdown(get_vowel_diacritic(pred_vowel_diacritic))
+    st.markdown(get_consonant_diacritic(np.argmax(pr[2], axis=-1)[0]))
+
+    plt.imshow(img[0, ::])
+    plt.show()
+
+    st.subheader("Grapheme : "+str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
+
+
+
+
+
+
+
+
+
+
+# if uploaded_file:
+#     img = tf.keras.utils.load_img(uploaded_file, color_mode='grayscale',target_size=(120, 120))
+#     img = tf.keras.utils.img_to_array(img)/255.
+#     img = np.expand_dims(img, axis=0)
+#     pr = model.predict(img, verbose=0)
     
-    pred_grapheme_root_char = get_grapheme_root(pred_grapheme_root)
-    pred_vowel_diacritic_char = get_vowel_diacritic(pred_vowel_diacritic)
-    pred_consonant_diacritic_char = get_consonant_diacritic(pred_consonant_diacritic)
+#     pred_grapheme_root = np.argmax(pr[0], axis=-1)[0]
+#     pred_vowel_diacritic = np.argmax(pr[1], axis=-1)[0]
+#     pred_consonant_diacritic = np.argmax(pr[2], axis=-1)[0]
     
-    # grapheme_pred = pred_grapheme_root_char + pred_vowel_diacritic_char + pred_consonant_diacritic_char
     
-    # st.write('Grapheme Root '+str(pred_grapheme_root_char)+' + Constant Diacritic '+str(pred_consonant_diacritic_char)+' + Vowel Diacritic '+str(pred_vowel_diacritic_char)+' = ', grapheme_pred)
+#     y_pred_grapheme_root.append(pred_grapheme_root)
+#     y_pred_vowel_diacritic.append(pred_vowel_diacritic)
+#     y_pred_consonant_diacritic.append(np.argmax(pr[2], axis=-1)[0])
     
-    grapheme_pred = pred_grapheme_root_char + pred_consonant_diacritic_char + pred_vowel_diacritic_char
+#     image = Image.open(uploaded_file)
     
-    st.markdown('Grapheme Root: '+str(pred_grapheme_root_char))
-    st.markdown('Vowel Diacritic: '+str(pred_vowel_diacritic_char))
-    st.markdown('Constant Diacritic: '+str(pred_consonant_diacritic_char))
+#     st.image(image, caption='Image Used for Reconstruction')
     
-    grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
+#     pred_grapheme_root_char = get_grapheme_root(pred_grapheme_root)
+#     pred_vowel_diacritic_char = get_vowel_diacritic(pred_vowel_diacritic)
+#     pred_consonant_diacritic_char = get_consonant_diacritic(pred_consonant_diacritic)
     
-    # st.write("Complete Prediction = ", grapheme_from_csv)
-    st.subheader(":green[Main Prediction =] "+str(grapheme_pred))
+#     # grapheme_pred = pred_grapheme_root_char + pred_vowel_diacritic_char + pred_consonant_diacritic_char
+    
+#     # st.write('Grapheme Root '+str(pred_grapheme_root_char)+' + Constant Diacritic '+str(pred_consonant_diacritic_char)+' + Vowel Diacritic '+str(pred_vowel_diacritic_char)+' = ', grapheme_pred)
+    
+#     grapheme_pred = pred_grapheme_root_char + pred_consonant_diacritic_char + pred_vowel_diacritic_char
+    
+#     st.markdown('Grapheme Root: '+str(pred_grapheme_root_char))
+#     st.markdown('Vowel Diacritic: '+str(pred_vowel_diacritic_char))
+#     st.markdown('Constant Diacritic: '+str(pred_consonant_diacritic_char))
+    
+#     grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
+    
+#     # st.write("Complete Prediction = ", grapheme_from_csv)
+#     st.subheader(":green[Main Prediction =] "+str(grapheme_pred))
