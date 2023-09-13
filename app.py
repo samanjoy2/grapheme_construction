@@ -204,11 +204,11 @@ if uploaded_file:
     
     grapheme_pred = pred_grapheme_root_char + pred_consonant_diacritic_char + pred_vowel_diacritic_char
     
-    st.subheader('Grapheme Root '+str(pred_grapheme_root_char))
-    st.subheader('Vowel Diacritic '+str(pred_vowel_diacritic_char))
-    st.subheader('Constant Diacritic '+str(pred_consonant_diacritic_char))
+    st.markdown('Grapheme Root: '+str(pred_grapheme_root_char))
+    st.markdown('Vowel Diacritic: '+str(pred_vowel_diacritic_char))
+    st.markdown('Constant Diacritic: '+str(pred_consonant_diacritic_char))
     
     grapheme_from_csv = df_gr.loc[(df['grapheme_root'] == pred_grapheme_root) & (df['vowel_diacritic'] == pred_vowel_diacritic) & (df['consonant_diacritic'] == pred_consonant_diacritic)].values[0][-1]
     
     # st.write("Complete Prediction = ", grapheme_from_csv)
-    st.subheader("Complete Prediction = ", grapheme_pred)
+    st.subheader(":green[Complete Prediction =] "+str(grapheme_pred))
