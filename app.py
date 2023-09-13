@@ -214,7 +214,7 @@ if uploaded_file:
     st.pyplot(plt, use_container_width=False)
 
     # st.subheader("Grapheme : "+str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
-    st.subheader(":green[Main Prediction =] "str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
+    st.subheader(":green[Main Prediction =] "+str(get_grapheme(pred_grapheme_root, pred_vowel_diacritic, pred_consonant_diacritic)))
 
 
 
